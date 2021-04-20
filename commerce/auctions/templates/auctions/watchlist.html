@@ -1,0 +1,36 @@
+{% extends 'auctions/layout.html' %}
+{% load static %}
+{% block content %}
+<div class="content-section mt-4">
+    <img src="{% static 'auctions/profile.png' %}">
+    <br>
+    <center>
+        <h3 class="border-bottom mb-3">
+            Your Watch List
+        </h3>
+        <div class="list-group" align="left">
+            <ul class="list-group">
+                {% for listing in listings %}
+                    {% for l in listing %}
+                        {% if l.is_closed == False %}
+                            <li>
+                                <a class="list-group-item list-group-item-action w-25" href="{% url 'details' l.pk %}"><h6>{{ l }}</h6></a>
+                            </li>
+                        {% endif %}
+                        {% if l.is_closed == True %}
+                            <li>
+                                <a class="list-group-item list-group-item-action w-25" href="{% url 'closed' %}">
+                                    {{ l }}
+                                    <span class="badge bg-primary rounded-pill">
+                                        1
+                                    </span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    </center>
+</div>
+{% endblock content %}

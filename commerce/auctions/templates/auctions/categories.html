@@ -1,0 +1,17 @@
+{% extends 'auctions/layout.html' %}
+{% block content %}
+<div class="content-section mt-3">
+    <center>
+        <form method="post" class="form-group">
+            {% csrf_token %}
+            <select name="category" class="form-select">
+                {% for category in categories %}
+                    <option class="list-group-item">{{ category }}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <input type="submit" class="btn btn-outline-info" align="left" value="Go">
+        </form>
+    </center>
+</div>
+{% endblock content %}

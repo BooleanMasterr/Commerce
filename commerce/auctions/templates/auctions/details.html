@@ -1,0 +1,98 @@
+{% extends 'auctions/layout.html' %}
+{% block content %}
+<div class="content-section mt-4">
+    <center class="border-bottom mb-3">
+        {% if obj.image_url %}
+            <img src="{{ obj.image_url }}" height="50%" width="50%">
+        {% endif %}
+        <h1>
+            {{ obj.title }}
+        </h1>
+    </center>
+    {% if obj.is_closed == False %}
+        {% if user == obj.seller %}
+            <a class="btn btn-outline-warning" href="{% url 'close' obj.pk %}"><i class="fa fa-shopping-bag"></i> Close <i class="fa fa-shopping-bag"></i></a>
+        {% endif %}
+    {% endif %}
+    {% if list == True %}
+        <form class="form-group mt-3" method="post" id="remove">
+            {% csrf_token %}
+            <button class="btn btn-outline-danger" type="submit" name="remove">
+                Remove from watch list
+                <i class="fa fa-minus-circle"></i>
+            </button>
+        </form>
+    {% else %}
+        <form method="post" class="form-group mt-3" id="watch">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-info" name="watch">
+                Add to watchlist
+                <i class="fa fa-bars">
+
+                </i>
+            </button>
+        </form>
+    {% endif %}
+    <br>
+    <p>
+        Seller: {{ obj.seller }}
+    </p>
+    <p>
+        Description: {{ obj.description }}
+    </p>
+    <p>
+        Bid: {{ bid.bid }}$
+    </p>
+    {% if bid.user != obj.seller %}
+        <p>
+            Highest Bidder: {{ bid.user }}
+        </p>
+    {% else %}
+        <p>
+            Highest Bidder: No one
+        </p>
+    {% endif %}
+    {% if user != obj.seller %}
+        <br>
+        <h2 class="border-bottom mb-3"> Place Your Bid </h2>
+        <form class="form-group" method="post">
+            {% csrf_token %}
+            <input class="form-control" placeholder="Bid" name="bid">
+        </form>
+    {% endif %}
+    <h2 class="border-bottom mb-3"> Comment </h2>
+    <form class="form-group" method="post">
+        {% csrf_token %}
+        <input class="form-control" placeholder="Add A Comment ... " name="comment">
+    </form>
+    <h2 class="border-top border-bottom mt-4 mb-4"> Comments </h2>
+    {% for comment in comments %}
+        <div class="content-section mt-2">
+            <p class="border-bottom mb-3 text-info">
+                Author: {{ comment.author }}
+            </p>
+            <p>
+                {{ comment.content }}
+            </p>
+            <footer class="border-top mt-3">
+                {{ comment.date }}
+            </footer>
+            <br>
+            {% if user == comment.author %}
+                <a class="btn btn-outline-secondary" href="{% url 'update-comment' comment.pk %}">
+                    Update
+                    <i class="fa fa-ellipsis-v">
+
+                    </i>
+                </a>
+                <a class="btn btn-outline-danger" href="{% url 'delete-comment' comment.pk %}">
+                    Delete
+                    <i class="fa fa-trash">
+
+                    </i>
+                </a>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+{% endblock content %}

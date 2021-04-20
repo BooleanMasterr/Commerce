@@ -1,0 +1,25 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+{% block content %}
+<link href="{% static 'auctions/styles.css' %}">
+<div class="mt-3">
+    {% for bid in bids %}
+        <div class="content-section mb-3">
+            <center>
+                {% if bid.listing_key.image_url %}
+                    <img src="{{ bid.listing_key.image_url }}" class="img" height="50%" width="50%">
+                {% endif %}
+                <h1 class="border-bottom mb-2">{{ bid.listing_key.title }}</h1>
+                    {% if bid.user  %}
+                        <h1>'{{ bid.user }}' Won this auction</h1>
+                    {% else %}
+                        <h1>
+                            No one bid for this auction :(
+                        </h1>
+                    {% endif %}
+                <br>
+            </center>
+        </div>
+    {% endfor %}
+</div>
+{% endblock content %}
