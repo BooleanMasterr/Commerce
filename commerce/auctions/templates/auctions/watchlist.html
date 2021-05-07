@@ -13,12 +13,12 @@
                 {% for listing in listings %}
                     {% for l in listing %}
                         {% if l.is_closed == False %}
-                            <li>
-                                <a class="list-group-item list-group-item-action w-25" href="{% url 'details' l.pk %}"><h6>{{ l }}</h6></a>
+                            <li class=" list-group rm__bullets">
+                                <a class="list-group-item list-group-item-action w-25 " href="{% url 'details' l.pk %}"><h6>{{ l }}</h6></a>
                             </li>
                         {% endif %}
                         {% if l.is_closed == True %}
-                            <li>
+                            <li class="list-group rm__bullets">
                                 <a class="list-group-item list-group-item-action w-25" href="{% url 'closed' %}">
                                     {{ l }}
                                     <span class="badge bg-primary rounded-pill">

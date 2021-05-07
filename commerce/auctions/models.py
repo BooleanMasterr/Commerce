@@ -48,15 +48,20 @@ class Bid(models.Model):
             bids = []
 
             for obj in queryset:
-                bid = Bid.objects.filter(listing_key=obj, is_closed=False).order_by('-bid')[0]
-                bids.append(bid)
+                try:
+                    bid = Bid.objects.filter(listing_key=obj, is_closed=False).order_by('-bid')[0]
+                except IndexError:
+                    bids.append(None)
+                else:
+                    bids.append(bid)
 
             return bids
         try:
             obj = Bid.objects.filter(listing_key=key, is_closed=False).order_by('-bid')[0]
-            return obj
         except IndexError:
             return None
+        else:
+            return obj
 
 
 

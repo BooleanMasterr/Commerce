@@ -84,3 +84,7 @@ ul {
 .account-heading {
     font-size: 2.5rem;
 }
+
+.rm__bullets {
+  list-style-type: none; /* Remove bullets */
+}

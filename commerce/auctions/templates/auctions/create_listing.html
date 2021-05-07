@@ -6,7 +6,7 @@
     <br>
     <form class="form-group" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form | linebreaks}}
+        {{ form }}
         <button type="submit" class="btn btn-outline-primary">Create <i class="fa fa-plus"></i> </button>
     </form>
 </div>

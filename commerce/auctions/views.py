@@ -110,11 +110,11 @@ class ActiveListings(LoginRequiredMixin, ListView):
     context_object_name = 'listings'
     ordering = '-date'
     template_name = 'auctions/active_listings.html'
+    queryset = Listing.objects.filter(is_closed=False)
 
     def get_context_data(self, *, object_list=None, **kwargs):
 
         context = super().get_context_data(**kwargs)
-
         bids = Bid.arg_max(queryset=self.get_queryset())
         listings_ = Listing.objects.filter(is_closed=False)
         try:
