@@ -18,7 +18,7 @@ class Listing(models.Model):
     seller = models.ForeignKey(User, on_delete=models.CASCADE)
     bid = models.DecimalField(decimal_places=2, max_digits=20)
     date = models.DateTimeField(default=timezone.now, unique=True)
-    title = models.CharField(max_length=300, unique=True)
+    title = models.CharField(max_length=300)
     description = models.TextField(max_length=400, blank=True)
     is_closed = models.BooleanField(default=False)
     category = models.CharField(choices=CHOICES, max_length=255, blank=True)

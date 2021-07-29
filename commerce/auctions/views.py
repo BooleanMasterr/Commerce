@@ -1,20 +1,19 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.views.generic import (
-                                  ListView,
-                                  DetailView,
-                                  CreateView,
-                                  UpdateView,
-                                  DeleteView,
-
-                                  )
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+)
 from .models import (
-                     Listing,
-                     WatchList,
-                     Bid,
-                     Comment,
-                     CHOICES,
-                     )
+    Listing,
+    WatchList,
+    Bid,
+    Comment,
+    CHOICES,
+)
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponseRedirect
@@ -23,11 +22,12 @@ from django.contrib import messages
 from .forms import CreateListingForm, CommentUpdateForm, CloseBiddingForm
 from django.db import IntegrityError
 from django.db.models import ObjectDoesNotExist
+
 # Create your views here.
 
 
 def index(request):
-    return render(request, 'auctions/index.html', {})
+    return render(request, "auctions/index.html", {})
 
 
 def categories(request):
@@ -35,18 +35,16 @@ def categories(request):
     categories_ = []
 
     for category in CHOICES:
-        categories_.append(f'{category[0][0].upper()}{category[0][1:]}')
+        categories_.append(f"{category[0][0].upper()}{category[0][1:]}")
 
-    if request.method == 'POST':
-        if 'category' in request.POST:
-            category = request.POST['category']
-            return HttpResponseRedirect(reverse('display', args=(category.lower(),)))
+    if request.method == "POST":
+        if "category" in request.POST:
+            category = request.POST["category"]
+            return HttpResponseRedirect(reverse("display", args=(category.lower(),)))
 
-    context = {
-        'categories': categories_
-    }
+    context = {"categories": categories_}
 
-    return render(request, 'auctions/categories.html', context)
+    return render(request, "auctions/categories.html", context)
 
 
 def display_categories(request, category):
@@ -54,62 +52,72 @@ def display_categories(request, category):
     listings = Listing.objects.filter(category=category, is_closed=False)
 
     context = {
-        'category': category,
-        'listings': listings,
+        "category": category,
+        "listings": listings,
     }
 
-    return render(request, 'auctions/active_listings.html', context)
+    return render(request, "auctions/active_listings.html", context)
 
 
 class CreateListing(LoginRequiredMixin, CreateView):
     model = Listing
-    template_name = 'auctions/create_listing.html'
-    context_object_name = 'form'
+    template_name = "auctions/create_listing.html"
+    context_object_name = "form"
     form_class = CreateListingForm
 
     def post(self, request, *args, **kwargs):
 
-        bid = self.request.POST.get('bid')
+        bid = self.request.POST.get("bid")
         user = self.request.user
-        title = self.request.POST.get('title')
-        description = self.request.POST.get('description')
-        category = self.request.POST.get('category')
-        if self.request.POST.get('image_url'):
+        title = self.request.POST.get("title")
+        description = self.request.POST.get("description")
+        category = self.request.POST.get("category")
+        if self.request.POST.get("image_url"):
 
-            image_url = self.request.POST.get('image_url')
+            image_url = self.request.POST.get("image_url")
 
             try:
-                instance = Listing.objects.create(seller=user, title=title, bid=bid, description=description,
-                                                  category=category,
-                                                  image_url=image_url)
+                instance = Listing.objects.create(
+                    seller=user,
+                    title=title,
+                    bid=bid,
+                    description=description,
+                    category=category,
+                    image_url=image_url,
+                )
                 Bid.objects.create(listing_key=instance, bid=bid)
-                messages.success(request, 'Successfully created your listing')
+                messages.success(request, "Successfully created your listing")
 
-                return HttpResponseRedirect(reverse('listings'))
+                return HttpResponseRedirect(reverse("listings"))
             except IntegrityError:
-                messages.error(request, 'Title must be unique')
+                messages.error(request, "Title must be unique")
 
-                return HttpResponseRedirect(reverse('create'))
+                return HttpResponseRedirect(reverse("create"))
         else:
 
             try:
-                instance = Listing.objects.create(seller=user, title=title, bid=bid, description=description,
-                                                  category=category,)
+                instance = Listing.objects.create(
+                    seller=user,
+                    title=title,
+                    bid=bid,
+                    description=description,
+                    category=category,
+                )
                 Bid.objects.create(listing_key=instance, bid=bid)
-                messages.success(request, 'Successfully created your listing')
+                messages.success(request, "Successfully created your listing")
 
-                return HttpResponseRedirect(reverse('listings'))
+                return HttpResponseRedirect(reverse("listings"))
             except IntegrityError:
-                messages.error(request, 'Title must be unique')
+                messages.error(request, "Title must be unique")
 
-                return HttpResponseRedirect(reverse('create'))
+                return HttpResponseRedirect(reverse("create"))
 
 
 class ActiveListings(LoginRequiredMixin, ListView):
     model = Listing
-    context_object_name = 'listings'
-    ordering = '-date'
-    template_name = 'auctions/active_listings.html'
+    context_object_name = "listings"
+    ordering = "-date"
+    template_name = "auctions/active_listings.html"
     queryset = Listing.objects.filter(is_closed=False)
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -119,18 +127,18 @@ class ActiveListings(LoginRequiredMixin, ListView):
         listings_ = Listing.objects.filter(is_closed=False)
         try:
             listings = list((zip(reversed(listings_), bids)))
-            context['listings'] = listings
+            context["listings"] = listings
         except TypeError:
-            context['listings'] = None
+            context["listings"] = None
 
         return context
 
 
 class ClosedListings(LoginRequiredMixin, ListView):
     model = Bid
-    context_object_name = 'bids'
-    template_name = 'auctions/closed_listings.html'
-    ordering = '-date   '
+    context_object_name = "bids"
+    template_name = "auctions/closed_listings.html"
+    ordering = "-date   "
 
     def get_queryset(self):
 
@@ -139,34 +147,46 @@ class ClosedListings(LoginRequiredMixin, ListView):
 
 class ListingDetails(LoginRequiredMixin, DetailView):
     model = Listing
-    context_object_name = 'obj'
-    template_name = 'auctions/details.html'
+    context_object_name = "obj"
+    template_name = "auctions/details.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        listing_bid = Bid.arg_max(key=self.get_object())  # return the bid object for the listing
+        listing_bid = Bid.arg_max(
+            key=self.get_object()
+        )  # return the bid object for the listing
         # gets the comments for the listing
-        comments = Comment.objects.filter(listing_key=self.get_object()).order_by('-date')
+        comments = Comment.objects.filter(listing_key=self.get_object()).order_by(
+            "-date"
+        )
         obj = Listing.objects.get(is_closed=False, pk=self.get_object().pk)
         try:
-            watch_list = WatchList.objects.get(user=self.request.user, listing_key=self.get_object())
-            context['list'] = watch_list.is_watched
+            watch_list = WatchList.objects.get(
+                user=self.request.user, listing_key=self.get_object()
+            )
+            context["list"] = watch_list.is_watched
         except (ObjectDoesNotExist, IndexError):
-            context['list'] = None
+            context["list"] = None
 
-        context['obj'] = obj
-        context['bid'] = listing_bid
-        context['comments'] = comments
+        context["obj"] = obj
+        context["bid"] = listing_bid
+        context["comments"] = comments
 
         return context
 
     def post(self, request, *args, **kwargs):
         # get the post data and process it
 
-        if self.request.POST.get('bid'):
+        if self.request.POST.get("bid"):
 
-            bid = int(self.request.POST.get('bid'))
+            try:
+                bid = float(self.request.POST.get('bid'))
+            except ValueError:
+                messages.error(request, 'Invalid input for Bid')
+
+                return HttpResponseRedirect(reverse('details', args=(self.get_object().pk,)))
+
             current_bid = Bid.arg_max(key=self.get_object()).bid
 
             if bid > current_bid:
@@ -178,14 +198,18 @@ class ListingDetails(LoginRequiredMixin, DetailView):
 
                 messages.success(request, "Bid placed successfully")
 
-                return HttpResponseRedirect(reverse('details', args=(self.get_object().pk,)))
+                return HttpResponseRedirect(
+                    reverse("details", args=(self.get_object().pk,))
+                )
             else:
-                messages.error(request, 'Bid must be higher than current bid')
-                return HttpResponseRedirect(reverse('details', args=(self.get_object().pk,)))
+                messages.error(request, "Bid must be higher than current bid")
+                return HttpResponseRedirect(
+                    reverse("details", args=(self.get_object().pk,))
+                )
 
-        elif self.request.POST.get('comment'):
+        elif self.request.POST.get("comment"):
 
-            comment = self.request.POST.get('comment')
+            comment = self.request.POST.get("comment")
 
             comment_ = Comment()
             comment_.content = comment
@@ -193,42 +217,52 @@ class ListingDetails(LoginRequiredMixin, DetailView):
             comment_.listing_key = self.get_object()
             comment_.save()
 
-            messages.success(request, 'Comment added successfully')
+            messages.success(request, "Comment added successfully")
 
-            return HttpResponseRedirect(reverse('details', args=(self.get_object().pk,)))
+            return HttpResponseRedirect(
+                reverse("details", args=(self.get_object().pk,))
+            )
 
-        elif 'watch' in self.request.POST:
+        elif "watch" in self.request.POST:
 
-            watch_list, created = WatchList.objects.get_or_create(user=self.request.user)
+            watch_list, created = WatchList.objects.get_or_create(
+                user=self.request.user
+            )
             watch_list.is_watched = True
             watch_list.listing_key.add(self.get_object())
             watch_list.save()
 
-            messages.success(request, f'Successfully added {self.get_object().title} to Watch list')
+            messages.success(
+                request, f"Successfully added {self.get_object().title} to Watch list"
+            )
 
-            return HttpResponseRedirect(reverse('details', args=(self.get_object().pk,)))
+            return HttpResponseRedirect(
+                reverse("details", args=(self.get_object().pk,))
+            )
 
-        elif 'remove' in self.request.POST:
+        elif "remove" in self.request.POST:
             results = WatchList.objects.filter(user=self.request.user)
             rm = results[0].listing_key.all()
             results[0].listing_key.remove(rm[0].pk)
 
-            messages.success(request, 'Removed listing from Watch list')
+            messages.success(request, "Removed listing from Watch list")
 
-            return HttpResponseRedirect(reverse('details', args=(self.get_object().pk,)))
+            return HttpResponseRedirect(
+                reverse("details", args=(self.get_object().pk,))
+            )
 
         return self.get(self, request, *args, **kwargs)
 
 
 class UpdateComment(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
-    context_object_name = 'form'
+    context_object_name = "form"
     form_class = CommentUpdateForm
-    template_name = 'auctions/comment_update.html'
+    template_name = "auctions/comment_update.html"
 
     def get_success_url(self):
 
-        return reverse('details', args=(self.get_object().listing_key.pk,))
+        return reverse("details", args=(self.get_object().listing_key.pk,))
 
     def form_valid(self, form):
 
@@ -247,14 +281,14 @@ class UpdateComment(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 
 class CloseBidding(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    template_name = 'auctions/close.html'
+    template_name = "auctions/close.html"
     model = Listing
-    context_object_name = 'obj'
+    context_object_name = "obj"
     form_class = CloseBiddingForm
 
     def post(self, request, *args, **kwargs):
 
-        if 'close' in self.request.POST:
+        if "close" in self.request.POST:
             listing = self.get_object()
             listing.is_closed = True
             listing.save()
@@ -263,7 +297,9 @@ class CloseBidding(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             bid.is_closed = True
             bid.save()
 
-            return HttpResponseRedirect(reverse('listings'))
+            messages.info(request, 'Auction closed successfully')
+
+            return HttpResponseRedirect(reverse("closed"))
 
         return self.get(self, request, *args, **kwargs)
 
@@ -278,8 +314,8 @@ class CloseBidding(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class DeleteComment(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
-    template_name = 'auctions/comment_delete.html'
-    context_object_name = 'comment'
+    template_name = "auctions/comment_delete.html"
+    context_object_name = "comment"
 
     def test_func(self):
         comment = self.get_object()
@@ -291,15 +327,15 @@ class DeleteComment(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def get_success_url(self):
 
-        messages.success(self.request, 'Deleted comment')
+        messages.success(self.request, "Deleted comment")
 
-        return reverse('details', args=(self.get_object().listing_key.pk,))
+        return reverse("details", args=(self.get_object().listing_key.pk,))
 
 
 class ViewWatchList(LoginRequiredMixin, ListView):
     model = WatchList
-    template_name = 'auctions/watchlist.html'
-    context_object_name = 'listings'
+    template_name = "auctions/watchlist.html"
+    context_object_name = "listings"
 
     def get_queryset(self):
 
