@@ -1,6 +1,7 @@
 {% extends "auctions/layout.html" %}
 {% block content %}
 <div class="content-section mt-4">
+    <h1 class="border-bttom mb-4">Login</h1>
     <form method="post" class="form-group">
         {% csrf_token %}
         <input class="form-control" name="username" placeholder="Username">
