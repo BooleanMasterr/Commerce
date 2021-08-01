@@ -26,10 +26,6 @@ from django.db.models import ObjectDoesNotExist
 # Create your views here.
 
 
-def index(request):
-    return render(request, "auctions/index.html", {})
-
-
 def categories(request):
 
     categories_ = []
@@ -49,12 +45,17 @@ def categories(request):
 
 def display_categories(request, category):
 
-    listings = Listing.objects.filter(category=category, is_closed=False)
+    context = {}
 
-    context = {
-        "category": category,
-        "listings": listings,
-    }
+    listings = Listing.objects.filter(category=category, is_closed=False)
+    bids = Bid.arg_max(queryset=listings)
+    try:
+        listings = list((zip(reversed(listings), bids)))
+        context["listings"] = listings
+    except TypeError:
+        context["listings"] = None
+
+    context = {"listings": listings, "bid": bids}
 
     return render(request, "auctions/active_listings.html", context)
 
@@ -181,11 +182,13 @@ class ListingDetails(LoginRequiredMixin, DetailView):
         if self.request.POST.get("bid"):
 
             try:
-                bid = float(self.request.POST.get('bid'))
+                bid = float(self.request.POST.get("bid"))
             except ValueError:
-                messages.error(request, 'Invalid input for Bid')
+                messages.error(request, "Invalid input for Bid")
 
-                return HttpResponseRedirect(reverse('details', args=(self.get_object().pk,)))
+                return HttpResponseRedirect(
+                    reverse("details", args=(self.get_object().pk,))
+                )
 
             current_bid = Bid.arg_max(key=self.get_object()).bid
 
@@ -297,7 +300,7 @@ class CloseBidding(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             bid.is_closed = True
             bid.save()
 
-            messages.info(request, 'Auction closed successfully')
+            messages.info(request, "Auction closed successfully")
 
             return HttpResponseRedirect(reverse("closed"))
 

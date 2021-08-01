@@ -2,45 +2,47 @@
 {% block content %}
 
 {% if listings %}
-    {% for listing, bid in listings %}
+{% for listing, bid in listings %}
 
-        <div class="content-section mt-4">
+<div class="content-section mt-4">
 
-            <center class="border-bottom mb-2">
-                {% if listing.image_url %}
-                    <img src="{{ listing.image_url }}" height="50%" width="50%">
-                    <br>
-                {% endif %}
-                <h1>{{ listing.title }}</h1>
-            </center>
-            <p>
-                Bid: {{ bid.bid }}
-            </p>
-            <p>
-                Seller: {{ listing.seller }}
-            </p>
-            {% if listing.description %}
-                <p>
-                  Description: {{ listing.description }}
-                </p>
-            {% else %}
-                <p>
-                    Description: None
-                </p>
-            {% endif %}
-            <a class="btn btn-outline-secondary" href="{% url 'details' listing.pk %}">
-                Details
-                <i class="fa fa-arrow-to-right">
+    <center class="border-bottom mb-2">
+        {% if listing.image_url %}
+        <img src="{{ listing.image_url }}" height="50%" width="50%">
+        <br>
+        {% endif %}
+        <h1>{{ listing.title }}</h1>
+    </center>
+    <p>
+        Bid: {{ bid.bid }}$
+    </p>
+    <p>
+        Seller: {{ listing.seller }}
+    </p>
+    {% if listing.description %}
+    <p>
+        Description: {{ listing.description }}
+    </p>
+    {% else %}
+    <p>
+        Description: None
+    </p>
+    {% endif %}
+    <a class="btn btn-outline-secondary" href="{% url 'details' listing.pk %}">
+        Details
+        <i class="fa fa-arrow-to-right">
 
-                </i>
-            </a>
-            <footer class="border-top mt-2 text-muted">
-                Date created: {{ listing.date }}
-            </footer>
+        </i>
+    </a>
+    <footer class="border-top mt-2 text-muted">
+        Date created: {{ listing.date }}
+    </footer>
 
-        </div>
-    {% endfor %}
+</div>
+{% endfor %}
 {% else %}
-    <center><h5>No listings to display</h5></center>
+<center>
+    <h5>No listings to display</h5>
+</center>
 {% endif %}
 {% endblock content %}
