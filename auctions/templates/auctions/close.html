@@ -1,0 +1,15 @@
+{% extends 'auctions/layout.html' %}
+{% block content %}
+<div class="content-section">
+    <h2> Are you sure you want close this Listing? </h2>
+    <br>
+    <form class="form-group" id="close" method="post">
+        {% csrf_token %}
+        <button class="btn btn-outline-warning" type="submit" name="close"><i class="fa fa-shopping-bag"></i> Close </button>
+        <a class="btn btn-outline-secondary" href="{% url 'details' obj.pk %}">
+            Cancel
+            <i class="fa fa-close"></i>
+        </a>
+    </form>
+</div>
+{% endblock content %}

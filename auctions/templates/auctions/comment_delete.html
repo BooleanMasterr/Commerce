@@ -1,0 +1,24 @@
+{% extends 'auctions/layout.html' %}
+{% block content %}
+<div class="content-section mt-4">
+    <h4> Are you sure you want to Delete this comment ? </h4>
+    <br>
+    <form class="form-group" method="post">
+        {% csrf_token %}
+        <button class="btn btn-outline-danger" type="submit">
+            Delete
+            <i class="fa fa-trash">
+
+            </i>
+        </button>
+
+        <a class="btn btn-outline-secondary" href="{% url 'details' comment.listing_key.pk %}">
+            Cancel
+            <i class="fa fa-arrow-to-right">
+
+            </i>
+        </a>
+
+    </form>
+</div>
+{% endblock content %}
